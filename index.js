@@ -11,11 +11,12 @@ app.get("/", (req, res) => {
 io.on("connection", (socket) => {
   //connect event
   const conn_msg = "A user connected";
-  io.emit("new user", conn_msg);
+  socket.broadcast.emit("new user", conn_msg);
 
+  //receive message
   socket.on("sender message", (msg) => {
-    console.log(`sent message: ${msg}`);
-    io.emit("receiver response", { text: msg });
+    socket.broadcast.emit("receiver response", { text: msg });
+    //broadcast message
   });
 
   // Each socket also fires a special disconnect event:
@@ -27,3 +28,5 @@ const PORT = process.env.port || 3000;
 http.listen(PORT, () => console.log("Listening on port " + PORT));
 
 //auto exposes an endpoint /socket.io/socket.io.js
+//io.emit broadcast to every connected sockets
+//sender.broadcast.emit broadcast to every socket except the emitting socket

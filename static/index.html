@@ -60,13 +60,18 @@
         var socket = io();
 
         //connected
-        socket.on("new user", (msg) =>
+        socket.on("random", (msg) =>
           $("#messages").append($("<li>").text(msg))
         );
 
+        socket.on("join", (msg) => {
+          const name = prompt(msg);
+          socket.emit("new user", name);
+        });
+
         //disconnected
-        socket.on("left user", (msg) =>
-          $("#messages").append($("<li>").text(msg))
+        socket.on("left user", (data) =>
+          data.map((info) => $("#messages").append($("<li>").text(info)))
         );
 
         //send message
@@ -77,6 +82,19 @@
           $("#m").val("");
           return false;
         });
+
+        $("input").focus((e) => {
+          socket.emit("typing", "user is typing...");
+        });
+
+        $("input").blur((e) => {
+          socket.emit("stop typing");
+        });
+
+        //know when someone is typing
+        socket.on("typing", (msg) =>
+          $("#messages").prepend($("<li>").text(msg))
+        );
 
         //receive broadcast
         socket.on("receiver response", function (msg) {

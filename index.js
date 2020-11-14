@@ -8,16 +8,26 @@ app.get("/", (req, res) => {
   res.sendFile(__dirname + "/static/index.html");
 });
 
+app.get("/assets/jquery.js", (req, res) =>
+  res.sendFile(__dirname + "/assets/jquery.js")
+);
+
 const people = [];
 
 io.on("connection", (socket) => {
   //connect event
 
-  socket.emit("random", "Welcome to Laplace chat");
   socket.emit("join", "What is your name?");
 
   socket.on("new user", (name) => {
-    people.push({ [socket.id]: name });
+    if (name === null || name === undefined || name === "null") {
+      socket.emit("random", "Not Joined, Please refresh this page");
+      socket.disconnect();
+      return;
+    }
+    console.log(name);
+    people.push({ id: socket.id, name });
+    socket.emit("random", "Welcome to Laplace chat");
     socket.broadcast.emit("random", `${name} joined`);
     io.emit("random", `${people.length} online`);
   });
@@ -34,8 +44,16 @@ io.on("connection", (socket) => {
   });
 
   // Each socket also fires a special disconnect event:
-  const disconn_msg = "A user disconnected";
-  socket.on("disconnect", () => io.emit("left user", disconn_msg));
+  socket.on("disconnect", () => {
+    if (people.length < 1) return;
+    const client = people.find((x) => x.id === socket.id);
+    if (!client) return;
+    const clientIndex = people.indexOf(client);
+    socket.broadcast.emit("left user", [`${client.name} left`]);
+    people.splice(clientIndex, 1);
+    console.log(people);
+    io.emit("random", `${people.length} online`);
+  });
 });
 
 const PORT = process.env.port || 3000;

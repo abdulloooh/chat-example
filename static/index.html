@@ -50,7 +50,9 @@
     </form>
 
     <script src="/socket.io/socket.io.js"></script>
-    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script src="/assets/jquery.js"></script>
+    <!-- https://code.jquery.com/jquery-3.4.1.min.js -->
+
     <script>
       // var socket = io();
       //Notice that I’m not specifying any URL when I call io(), since it defaults to trying to connect to the host that serves the page.
@@ -59,14 +61,16 @@
       $(function () {
         var socket = io();
 
-        //connected
         socket.on("random", (msg) =>
           $("#messages").append($("<li>").text(msg))
         );
 
         socket.on("join", (msg) => {
-          const name = prompt(msg);
-          socket.emit("new user", name);
+          let name;
+          name = prompt(msg);
+
+          if (name && name !== "null") socket.emit("new user", name);
+          else socket.emit("new user", undefined);
         });
 
         //disconnected

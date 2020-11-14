@@ -72,3 +72,4 @@ http.listen(PORT, () => console.log("Listening on port " + PORT));
 //io.emit broadcast to every connected sockets
 //sender.broadcast.emit broadcast to every socket except the emitting socket
 //socket.emit to send to the emitting socket only
+//socket.disconnect()

@@ -7,11 +7,12 @@
   "author": "abdulloooh <abdullahakinwumi@gmail.com>",
   "license": "MIT",
   "dependencies": {
+    "debug": "^4.2.0",
     "express": "^4.17.1",
     "socket.io": "^3.0.1",
     "socket.io-client": "^3.0.1"
   },
   "scripts": {
-    "start": "nodemon index.js"
+    "start": "DEBUG=socket.io:* nodemon index.js"
   }
 }

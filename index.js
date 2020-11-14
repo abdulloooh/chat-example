@@ -1,4 +1,5 @@
 const app = require("express")();
+const log = require("debug")("socket.io:server");
 
 //socket.io mounts on node.js http server
 const http = require("http").createServer(app);
@@ -65,10 +66,16 @@ io.on("connection", (socket) => {
 });
 
 const PORT = process.env.port || 3000;
-http.listen(PORT, () => console.log("Listening on port " + PORT));
+http.listen(PORT, () => log("Listening on port " + PORT));
 
 //auto exposes an endpoint /socket.io/socket.io.js
 //io.emit broadcast to every connected sockets
 //sender.broadcast.emit broadcast to every socket except the emitting socket
 //socket.emit to send to the emitting socket only
 //socket.disconnect()
+
+/**
+The socket object on both sides extends the EventEmitter class, so:
+sending an event is done with: socket.emit()
+receiving an event is done by registering a listener: socket.on(<event name>, <listener>)
+ */

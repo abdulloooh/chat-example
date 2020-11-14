@@ -60,7 +60,6 @@ io.on("connection", (socket) => {
     const clientIndex = people.indexOf(client);
     socket.broadcast.emit("left user", [`${client.name} left`]);
     people.splice(clientIndex, 1);
-    console.log(people);
     io.emit("random", `${people.length} online`);
   });
 });

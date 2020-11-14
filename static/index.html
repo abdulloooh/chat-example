@@ -44,6 +44,7 @@
     </style>
   </head>
   <body>
+    <p id="typing"></p>
     <ul id="messages"></ul>
     <form action="">
       <input id="m" autocomplete="off" /><button>Send</button>
@@ -61,10 +62,6 @@
       $(function () {
         var socket = io();
 
-        socket.on("random", (msg) =>
-          $("#messages").append($("<li>").text(msg))
-        );
-
         socket.on("join", (msg) => {
           let name;
           name = prompt(msg);
@@ -73,22 +70,12 @@
           else socket.emit("new user", undefined);
         });
 
-        //disconnected
-        socket.on("left user", (data) =>
-          data.map((info) => $("#messages").append($("<li>").text(info)))
+        socket.on("random", (msg) =>
+          $("#messages").append($("<li>").text(msg))
         );
 
-        //send message
-        $("form").submit(function (e) {
-          e.preventDefault(); // prevents page reloading
-          socket.emit("sender message", $("#m").val());
-          $("#messages").append($("<li>").text($("#m").val()));
-          $("#m").val("");
-          return false;
-        });
-
         $("input").focus((e) => {
-          socket.emit("typing", "user is typing...");
+          socket.emit("typing");
         });
 
         $("input").blur((e) => {
@@ -96,14 +83,26 @@
         });
 
         //know when someone is typing
-        socket.on("typing", (msg) =>
-          $("#messages").prepend($("<li>").text(msg))
-        );
+        socket.on("typing", (msg) => $("#typing").text(msg));
 
-        //receive broadcast
-        socket.on("receiver response", function (msg) {
-          $("#messages").append($("<li>").text(msg.text));
+        //send broadcast message
+        $("form").submit(function (e) {
+          e.preventDefault(); // prevents page reloading
+          socket.emit("sender message", $("#m").val());
+          $("#messages").append($("<li>").text("You:" + $("#m").val()));
+          $("#m").val("");
+          return false;
         });
+
+        //receive broadcast message
+        socket.on("receiver response", function (msg) {
+          $("#messages").append($("<li>").text(`${msg.sender}: ${msg.text}`));
+        });
+
+        //disconnected
+        socket.on("left user", (data) =>
+          data.map((info) => $("#messages").append($("<li>").text(info)))
+        );
       });
     </script>
   </body>

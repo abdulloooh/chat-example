@@ -25,7 +25,7 @@ io.on("connection", (socket) => {
       socket.disconnect();
       return;
     }
-    console.log(name);
+
     people.push({ id: socket.id, name });
     socket.emit("random", "Welcome to Laplace chat");
     socket.broadcast.emit("random", `${name} joined`);
@@ -33,13 +33,22 @@ io.on("connection", (socket) => {
   });
 
   //typing
-  socket.on("typing", (msg) => socket.broadcast.emit("typing", msg));
+  socket.on("typing", () =>
+    socket.broadcast.emit(
+      "typing",
+      `${people.find((p) => p.id === socket.id).name} is typing`
+    )
+  );
 
   // stop typing
+  socket.on("stop typing", () => socket.broadcast.emit("typing", ""));
 
-  //receive message
+  //receive broadcast message
   socket.on("sender message", (msg) => {
-    socket.broadcast.emit("receiver response", { text: msg });
+    socket.broadcast.emit("receiver response", {
+      text: msg,
+      sender: people.find((p) => p.id === socket.id).name,
+    });
     //broadcast message
   });
 

@@ -2,8 +2,12 @@ const app = require("express")();
 const log = require("debug")("socket.io:server");
 
 //socket.io mounts on node.js http server
-const http = require("http").createServer(app);
-const io = require("socket.io")(http);
+const server = require("http").createServer(app);
+
+//notable option
+const options = { maxHttpBufferSize: 1e8 /**,... */ };
+
+const io = require("socket.io")(server /**,options */);
 
 app.get("/", (req, res) => {
   res.sendFile(__dirname + "/static/index.html");
@@ -66,7 +70,7 @@ io.on("connection", (socket) => {
 });
 
 const PORT = process.env.port || 3000;
-http.listen(PORT, () => log("Listening on port " + PORT));
+server.listen(PORT, () => log("Listening on port " + PORT));
 
 //auto exposes an endpoint /socket.io/socket.io.js
 //io.emit broadcast to every connected sockets

@@ -9,8 +9,15 @@ const options = { maxHttpBufferSize: 1e8 /**,... */ };
 
 const io = require("socket.io")(server /**,options */);
 
+//middleware
+require("./namespace")(io, log);
+
 app.get("/", (req, res) => {
-  res.sendFile(__dirname + "/static/index.html");
+  res.sendFile(__dirname + "/assets/index.html");
+});
+
+app.get("/first-namespace", (req, res) => {
+  res.sendFile(__dirname + "/assets/namespace.html");
 });
 
 app.get("/assets/jquery.js", (req, res) =>
